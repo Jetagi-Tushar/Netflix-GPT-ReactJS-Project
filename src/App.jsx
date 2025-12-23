@@ -1,7 +1,12 @@
 import React from "react";
+import Body from "./components/Body.jsx";
 
 function App() {
-  return <div>App</div>;
+  return (
+    <>
+      <Body />
+    </>
+  );
 }
 
 export default App;
