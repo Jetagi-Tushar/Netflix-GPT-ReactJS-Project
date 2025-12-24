@@ -1,16 +1,96 @@
-import React from "react";
+import React, { use } from "react";
 import { Header } from "./Header";
+import { checkValidData } from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 
 const Login = () => {
   const [isSignin, setIsSignin] = React.useState(true);
+  const [errmsg, setErrmsg] = React.useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const toggleSignIn = () => {
     setIsSignin(!isSignin);
   };
 
+  const name = React.useRef(null);
+  const email = React.useRef(null);
+  const password = React.useRef(null);
+
+  const handleButtonClick = (e) => {
+    e.preventDefault();
+    const msg = checkValidData(email.current.value, password.current.value);
+    setErrmsg(msg);
+
+    if (msg) return;
+    // Proceed with sign-in or sign-up logic here
+    if (!isSignin) {
+      // Sign-up logic
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name.current.value,
+          })
+            .then(() => {
+              // Profile updated!
+              const { uid, email, displayName } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid,
+                  email,
+                  displayName,
+                })
+              );
+              navigate("/browse");
+            })
+            .catch((error) => {
+              // An error occurred
+              setErrmsg(error.message);
+            });
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrmsg(errorMessage);
+        });
+    } else {
+      // Sign-in logic
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+          navigate("/browse");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrmsg(errorMessage);
+        });
+    }
+  };
+
   return (
     <div>
-      <Header />
+      <Header isSignin={isSignin} />
       <div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
         <form className="w-85 p-8 bg-[rgba(2,6,23,0.85)] border rounded-2xl shadow-[0 20px 40px rgba(0,0,0,0.6)]">
           <h2 className="mb-7 text-xl text-center">
@@ -19,22 +99,29 @@ const Login = () => {
 
           {!isSignin && (
             <input
+              ref={name}
               className="w-full p-3 mb-3.5 bg-[#020617] border rounded-md text-[#e5e7eb]"
               type="text"
               placeholder="Full Name"
             />
           )}
           <input
+            ref={email}
             className="w-full p-3 mb-3.5 bg-[#020617] border rounded-md text-[#e5e7eb]"
             type="email"
             placeholder="Email Address"
           />
           <input
+            ref={password}
             className="w-full p-3 mb-3.5 bg-[#020617] border rounded-md text-[#e5e7eb]"
             type="password"
             placeholder="Password"
           />
-          <button className="w-full p-3 border-none rounded-lg mt-2 cursor-pointer font-semibold text-[#fefefe] bg-[#f84238]">
+          <p className="text-red-500 text-sm mb-1.5">{errmsg}</p>
+          <button
+            onClick={handleButtonClick}
+            className="w-full p-3 border-none rounded-lg mt-2 cursor-pointer font-semibold text-[#fefefe] bg-[#f84238]"
+          >
             {isSignin ? "Sign In" : "Sign Up"}
           </button>
           <p className="text-[#94a3b8] mt-5 text-sm">
