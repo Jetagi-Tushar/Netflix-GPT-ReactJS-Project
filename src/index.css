@@ -1,6 +1,42 @@
 @import "tailwindcss";
 
 body {
-  background: linear-gradient(135deg, #0f172a, #020617);
+  background: linear-gradient(100deg, #0f172a, #020617);
   color: #e5e7eb;
+}
+
+/* Movie Row Container */
+.movie-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 10px;
+}
+
+/* Hide scrollbar */
+.movie-row::-webkit-scrollbar {
+  display: none;
+}
+.movie-row {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.movie-card {
+  flex-shrink: 0;
+}
+/* Movie Card */
+.movie-card img {
+  height: 280px;
+  width: 200px;
+  object-fit: cover;
+  border-radius: 6px;
+  transition: transform 0.3s ease;
+}
+
+/* Hover effect */
+.movie-card img:hover {
+  transform: scale(1.08);
+  cursor: pointer;
 }
