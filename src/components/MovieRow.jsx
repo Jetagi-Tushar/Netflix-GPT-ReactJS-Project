@@ -19,7 +19,7 @@ const MovieRow = ({ title, category }) => {
         {movies.map((movie) => (
           <div
             key={`${category}-${movie.imdbID}`}
-            className="movie-card flex-shrink-0"
+            className="movie-card shrink-0"
           >
             <img
               className="
