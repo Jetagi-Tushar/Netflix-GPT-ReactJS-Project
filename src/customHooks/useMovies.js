@@ -35,4 +35,3 @@ const useMovies = (category, searchTerm) => {
   }, [category, searchTerm, dispatch]);
 };
 export default useMovies;
-// `${OMDB_BASE_URL}s=batman`;
